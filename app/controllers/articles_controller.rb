@@ -20,6 +20,9 @@ class ArticlesController < ApplicationController
   def create
     # byebug
     @article = Article.new(article_params)
+    
+    @article.user = User.first # Dung tam
+    
     # render plain: @article.inspect # For confirm
     if @article.save # Nham muc dich khi khong luu duoc thi khong chuyen trang
       flash[:notice] = "Article was created successfully" # Show message
