@@ -2,6 +2,8 @@ class ArticlesController < ApplicationController
   
   # DRY, run set_article funtion in the first when run show, edit, update, destroy
   before_action :set_article, only: [:show, :edit, :update, :destroy]
+  before_action :require_user, except: [:show, :index]
+  before_action :require_same_user, only: [:edit, :update, :destroy]
   
   def show
     # byebug
@@ -9,7 +11,7 @@ class ArticlesController < ApplicationController
   end
   
   def index
-    @articles = Article.all
+    @articles = Article.paginate(page: params[:page], per_page: 5)
   end
   
   def new
@@ -21,7 +23,8 @@ class ArticlesController < ApplicationController
     # byebug
     @article = Article.new(article_params)
     
-    @article.user = User.first # Dung tam
+    @article.user = current_user
+    # @article.user = User.first # Dung tam
     
     # render plain: @article.inspect # For confirm
     if @article.save # Nham muc dich khi khong luu duoc thi khong chuyen trang
@@ -61,6 +64,21 @@ class ArticlesController < ApplicationController
   def article_params
     params.require(:article).permit(:title, :description)
   end
+  
+  # def require_user   # Moved to application_controller
+  #   if !logged_in?
+  #     flash[:notice] = "You must be logged in to perform that action"
+  #     redirect_to login_path
+  #   end
+  # end
+  
+  def require_same_user
+    if current_user != @article.user
+      flash[:alert] = "You can only edit or delete your own article "
+      redirect_to @article
+    end
+  end
+  
   
 end
   
