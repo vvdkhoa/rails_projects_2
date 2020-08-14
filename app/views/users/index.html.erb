@@ -13,7 +13,9 @@
         <div class="card-header font-italic">
           <%= link_to user.username, user %>
         </div>
+
         <div class="card-body">
+
           <h5 class="card-title">
             <%= link_to gravatar_for(user, size: 150), user %>
           </h5>
@@ -21,10 +23,19 @@
             <%= pluralize(user.articles.count, "article") %>
           </p>
           <%= link_to "View profile", user, class: "btn btn-outline-info" %>
-          <% if logged_in? && user == current_user %>
-            <%= link_to "Edit", edit_user_path(user), class: "btn btn-outline-success" %>
+
+          <% if logged_in? %>
+            <% if user == current_user %>
+              <%= link_to "Edit", edit_user_path(user), class: "btn btn-outline-success" %>
+            <% end %>
+            <% if current_user.admin? %>
+              <%= link_to "Delete user", user_path(user), class: "btn btn-outline-danger", 
+                  method: :delete, data: {confirm: "Are you sure you want to delete the user account and all associated article"} %>
+              <% end %>
           <% end %>
+
         </div>
+
         <div class="card-footer text-muted">
           <small
             >Joined <%= time_ago_in_words(user.created_at) %> ago, edited
@@ -37,7 +48,6 @@
   <% end %>
 </div>
 
-<!--Paginate start-->
 <div class="flickr_pagination mb-4">
     <%= will_paginate @users, :container => false %>
 </div>
